@@ -14,8 +14,7 @@ const nextConfig = {
   webpack: (config) => {
     return config;
   },
-  // Ensure SWC is used for compilation
-  swcMinify: true,
+  // SWC is used by default in Next.js 15+
 };
 
 export default nextConfig;
