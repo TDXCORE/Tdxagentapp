@@ -1,0 +1,18 @@
+// Este archivo ha sido desactivado y reemplazado por app/dashboard/agent-chat/page.tsx
+// Por favor, no utilice este archivo para nuevos desarrollos.
+
+/*
+"use client"
+
+import type React from "react"
+
+import { useState } from "react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { useToast } from "@/hooks/use-toast"
+import { SendHorizontal } from "lucide-react"
+
+export default function AgentChatPage() {
+  // Código desactivado
+}
+*/

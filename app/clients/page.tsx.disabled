@@ -1,0 +1,18 @@
+// Este archivo ha sido desactivado y reemplazado por app/dashboard/clients/page.tsx
+// Por favor, no utilice este archivo para nuevos desarrollos.
+
+/*
+import type { Metadata } from "next"
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
+import { cookies } from "next/headers"
+import { ClientsTable } from "@/components/clients-table"
+
+export const metadata: Metadata = {
+  title: "Clients | TDX Agent Platform",
+  description: "Manage your clients",
+}
+
+export default async function ClientsPage() {
+  // Código desactivado
+}
+*/

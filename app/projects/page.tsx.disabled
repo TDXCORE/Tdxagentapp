@@ -1,0 +1,18 @@
+// Este archivo ha sido desactivado y reemplazado por app/dashboard/projects/page.tsx
+// Por favor, no utilice este archivo para nuevos desarrollos.
+
+/*
+import type { Metadata } from "next"
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
+import { cookies } from "next/headers"
+import { ProjectsTable } from "@/components/projects-table"
+
+export const metadata: Metadata = {
+  title: "Projects | TDX Agent Platform",
+  description: "Manage your projects",
+}
+
+export default async function ProjectsPage() {
+  // Código desactivado
+}
+*/
