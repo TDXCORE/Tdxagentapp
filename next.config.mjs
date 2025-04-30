@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
+  transpilePackages: ["react-day-picker"],
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -9,6 +11,9 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-}
+  webpack: (config) => {
+    return config;
+  },
+};
 
-export default nextConfig
+export default nextConfig;
