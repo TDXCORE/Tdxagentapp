@@ -73,25 +73,25 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(new URL(routes.login, req.url))
     }
 
-    // Get session for protected routes
-    if (isProtectedRoute(pathname)) {
-      const { data, error } = await supabase.auth.getSession()
+    // Temporarily disable authentication check for development
+    // if (isProtectedRoute(pathname)) {
+    //   const { data, error } = await supabase.auth.getSession()
 
-      if (error) {
-        console.error("Session error in middleware:", error.message)
-        // Store the original URL to redirect back after login
-        const redirectUrl = new URL(routes.login, req.url)
-        redirectUrl.searchParams.set("returnUrl", pathname)
-        return NextResponse.redirect(redirectUrl)
-      }
+    //   if (error) {
+    //     console.error("Session error in middleware:", error.message)
+    //     // Store the original URL to redirect back after login
+    //     const redirectUrl = new URL(routes.login, req.url)
+    //     redirectUrl.searchParams.set("returnUrl", pathname)
+    //     return NextResponse.redirect(redirectUrl)
+    //   }
 
-      if (!data.session) {
-        // Store the original URL to redirect back after login
-        const redirectUrl = new URL(routes.login, req.url)
-        redirectUrl.searchParams.set("returnUrl", pathname)
-        return NextResponse.redirect(redirectUrl)
-      }
-    }
+    //   if (!data.session) {
+    //     // Store the original URL to redirect back after login
+    //     const redirectUrl = new URL(routes.login, req.url)
+    //     redirectUrl.searchParams.set("returnUrl", pathname)
+    //     return NextResponse.redirect(redirectUrl)
+    //   }
+    // }
 
     // Redirect authenticated users away from auth pages
     if (isAuthRoute(pathname) && pathname !== routes.logout) {

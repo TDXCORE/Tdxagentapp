@@ -36,7 +36,7 @@ export function KPICards({ stats = defaultStats }: KPICardsProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.total_leads}</div>
-          <p className="text-xs text-muted-foreground">+{Math.floor(Math.random() * 20)}% from last month</p>
+          <p className="text-xs text-muted-foreground">+15% from last month</p>
         </CardContent>
       </Card>
 
@@ -88,7 +88,7 @@ export function KPICards({ stats = defaultStats }: KPICardsProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.avg_time_to_close} days</div>
-          <p className="text-xs text-muted-foreground">-{Math.floor(Math.random() * 10)}% from last month</p>
+          <p className="text-xs text-muted-foreground">-5% from last month</p>
         </CardContent>
       </Card>
     </>
