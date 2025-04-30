@@ -13,8 +13,8 @@ const nextConfig = {
   },
   webpack: (config) => {
     return config;
-  },
-  // SWC is used by default in Next.js 15+
+  }
+  // Eliminado comentario sobre SWC para evitar problemas de configuración
 };
 
 export default nextConfig;
