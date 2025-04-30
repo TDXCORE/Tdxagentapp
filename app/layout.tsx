@@ -5,7 +5,12 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { AuthProvider } from "@/components/auth-provider"
 
-const inter = Inter({ subsets: ["latin"] })
+// Configure the Inter font
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+})
 
 export const metadata: Metadata = {
   title: "TDX Agent Platform",
@@ -19,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning className={inter.variable}>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <AuthProvider>{children}</AuthProvider>
