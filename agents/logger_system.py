@@ -114,6 +114,41 @@ class AgentLogger:
         session_id = session_id or self.current_session_id
         if not session_id or session_id not in self.session_logs:
             logger.warning(f"Sesión {session_id} no encontrada")
+            
+            # Intentar cargar los logs desde el archivo JSONL
+            if session_id:
+                try:
+                    # Reconstruir la sesión desde el archivo JSONL
+                    session_data = {
+                        "session_id": session_id,
+                        "user_id": "unknown",
+                        "start_time": datetime.now().isoformat(),
+                        "interactions": []
+                    }
+                    
+                    # Leer el archivo JSONL línea por línea
+                    with open(self.log_file_path, 'r', encoding='utf-8') as f:
+                        for line in f:
+                            try:
+                                log_entry = json.loads(line.strip())
+                                if log_entry.get("session_id") == session_id:
+                                    # Añadir la interacción a la sesión
+                                    if "interaction" in log_entry:
+                                        session_data["interactions"].append(log_entry["interaction"])
+                                    # Actualizar user_id si está disponible
+                                    if "user_id" in log_entry:
+                                        session_data["user_id"] = log_entry["user_id"]
+                            except json.JSONDecodeError:
+                                logger.error(f"Error al decodificar línea JSON: {line}")
+                    
+                    # Si encontramos interacciones, guardar la sesión en memoria
+                    if session_data["interactions"]:
+                        self.session_logs[session_id] = session_data
+                        logger.info(f"Sesión {session_id} reconstruida desde archivo JSONL con {len(session_data['interactions'])} interacciones")
+                        return session_data
+                except Exception as e:
+                    logger.error(f"Error al reconstruir sesión desde archivo JSONL: {e}")
+            
             return {"error": "Sesión no encontrada"}
         
         return self.session_logs[session_id]
@@ -159,12 +194,12 @@ class AgentLogger:
                     "interaction": latest_interaction
                 }
                 
-                # Añadir al archivo como una nueva línea (append)
-                with open(self.log_file_path, 'a') as f:
-                    f.write(json.dumps(log_entry) + '\n')
+                # Añadir al archivo como una nueva línea (append) con codificación UTF-8
+                with open(self.log_file_path, 'a', encoding='utf-8') as f:
+                    f.write(json.dumps(log_entry, ensure_ascii=False) + '\n')
         
         except Exception as e:
-            logger.exception(f"Error al guardar logs en archivo")
+            logger.exception(f"Error al guardar logs en archivo: {e}")
             
     def get_current_session_id(self) -> Optional[str]:
         """
