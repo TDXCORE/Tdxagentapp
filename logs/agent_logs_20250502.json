@@ -6683,6 +6683,49 @@
         "metadata": {
           "phase": "output"
         }
+      },
+      {
+        "timestamp": "2025-05-02T21:49:07.696456",
+        "agent_type": "orchestrator",
+        "input": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "Eres un asistente \u00fatil para TDX, una empresa de desarrollo tecnol\u00f3gico. Tu funci\u00f3n es saludar al cliente, comprender sus necesidades y dirigirlos al agente especializado adecuado. Pregunta por su nombre, empresa y una breve descripci\u00f3n de lo que est\u00e1n buscando. Debes ser amable, profesional y eficiente en la identificaci\u00f3n de las necesidades del cliente."
+            },
+            {
+              "role": "user",
+              "content": "hola"
+            },
+            {
+              "role": "user",
+              "content": "hola como estas"
+            }
+          ],
+          "client_info": {
+            "name": "Usuario de Prueba",
+            "company_name": "Empresa de Prueba",
+            "email": "test@example.com"
+          },
+          "current_agent": "router",
+          "intent_detected": "general",
+          "user_id": "test_user_1746222546767"
+        },
+        "output": {},
+        "metadata": {
+          "phase": "input"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:49:08.258319",
+        "agent_type": "orchestrator",
+        "input": {},
+        "output": {
+          "error": "You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors."
+        },
+        "metadata": {
+          "phase": "error"
+        }
       }
     ]
   },
@@ -10425,6 +10468,252 @@
         "input": {},
         "output": {
           "response": "\u00a1Hola! Bienvenido a TDX. Antes de continuar, necesito tu consentimiento para tratar tus datos personales seg\u00fan nuestra pol\u00edtica de privacidad. \u00bfEst\u00e1s de acuerdo?",
+          "intent_detected": "greeting",
+          "next_agent": "router",
+          "confidence": 0.9,
+          "delegated": false
+        },
+        "metadata": {
+          "phase": "output",
+          "delegated": false
+        }
+      }
+    ]
+  },
+  {
+    "session_id": "test_user_1746222530619_20250502214850",
+    "user_id": "test_user_1746222530619",
+    "start_time": "2025-05-02T21:48:50.783664",
+    "interactions": [
+      {
+        "timestamp": "2025-05-02T21:48:50.805072",
+        "agent_type": "router",
+        "input": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "Eres un asistente \u00fatil para TDX, una empresa de desarrollo tecnol\u00f3gico. Tu funci\u00f3n es saludar al cliente, comprender sus necesidades y dirigirlos al agente especializado adecuado. Pregunta por su nombre, empresa y una breve descripci\u00f3n de lo que est\u00e1n buscando. Debes ser amable, profesional y eficiente en la identificaci\u00f3n de las necesidades del cliente."
+            },
+            {
+              "role": "user",
+              "content": "hola"
+            }
+          ],
+          "client_info": {
+            "name": "Usuario de Prueba",
+            "company_name": "Empresa de Prueba",
+            "email": "test@example.com"
+          },
+          "agent_type": "router_agent",
+          "user_id": "test_user_1746222530619"
+        },
+        "output": {},
+        "metadata": {
+          "phase": "input"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:48:51.396318",
+        "agent_type": "router",
+        "input": {},
+        "output": {
+          "error": "You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors."
+        },
+        "metadata": {
+          "phase": "error"
+        }
+      }
+    ]
+  },
+  {
+    "session_id": "test_user_1746222546767_20250502214906",
+    "user_id": "test_user_1746222546767",
+    "start_time": "2025-05-02T21:49:06.798226",
+    "interactions": [
+      {
+        "timestamp": "2025-05-02T21:49:06.798769",
+        "agent_type": "router",
+        "input": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "Eres un asistente \u00fatil para TDX, una empresa de desarrollo tecnol\u00f3gico. Tu funci\u00f3n es saludar al cliente, comprender sus necesidades y dirigirlos al agente especializado adecuado. Pregunta por su nombre, empresa y una breve descripci\u00f3n de lo que est\u00e1n buscando. Debes ser amable, profesional y eficiente en la identificaci\u00f3n de las necesidades del cliente."
+            },
+            {
+              "role": "user",
+              "content": "hola"
+            },
+            {
+              "role": "user",
+              "content": "hola como estas"
+            }
+          ],
+          "client_info": {
+            "name": "Usuario de Prueba",
+            "company_name": "Empresa de Prueba",
+            "email": "test@example.com"
+          },
+          "agent_type": "router_agent",
+          "user_id": "test_user_1746222546767"
+        },
+        "output": {},
+        "metadata": {
+          "phase": "input"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:49:07.239646",
+        "agent_type": "router->orchestrator",
+        "input": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "Eres un asistente \u00fatil para TDX, una empresa de desarrollo tecnol\u00f3gico. Tu funci\u00f3n es saludar al cliente, comprender sus necesidades y dirigirlos al agente especializado adecuado. Pregunta por su nombre, empresa y una breve descripci\u00f3n de lo que est\u00e1n buscando. Debes ser amable, profesional y eficiente en la identificaci\u00f3n de las necesidades del cliente."
+            },
+            {
+              "role": "user",
+              "content": "hola"
+            },
+            {
+              "role": "user",
+              "content": "hola como estas"
+            }
+          ],
+          "client_info": {
+            "name": "Usuario de Prueba",
+            "company_name": "Empresa de Prueba",
+            "email": "test@example.com"
+          },
+          "current_agent": "router",
+          "intent_detected": "general",
+          "user_id": "test_user_1746222546767",
+          "current_phase": "CONSENT"
+        },
+        "output": {},
+        "metadata": {
+          "phase": "delegation"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:49:08.384201",
+        "agent_type": "orchestrator->router",
+        "input": {},
+        "output": {
+          "response_content": "Lo siento, no pude procesar tu solicitud.",
+          "next_agent": "router",
+          "confidence": 0.9,
+          "current_phase": "CONSENT"
+        },
+        "metadata": {
+          "phase": "delegation_response"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:49:08.874428",
+        "agent_type": "router",
+        "input": {},
+        "output": {
+          "response": "Lo siento, no pude procesar tu solicitud.",
+          "intent_detected": "general",
+          "next_agent": "router",
+          "confidence": 0.9,
+          "delegated": true
+        },
+        "metadata": {
+          "phase": "output",
+          "delegated": true
+        }
+      }
+    ]
+  },
+  {
+    "session_id": "test_user_1746222890267_20250502215450",
+    "user_id": "test_user_1746222890267",
+    "start_time": "2025-05-02T21:54:50.294703",
+    "interactions": [
+      {
+        "timestamp": "2025-05-02T21:54:50.295242",
+        "agent_type": "router",
+        "input": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "Eres un asistente \u00fatil para TDX, una empresa de desarrollo tecnol\u00f3gico. Tu funci\u00f3n es saludar al cliente, comprender sus necesidades y dirigirlos al agente especializado adecuado. Pregunta por su nombre, empresa y una breve descripci\u00f3n de lo que est\u00e1n buscando. Debes ser amable, profesional y eficiente en la identificaci\u00f3n de las necesidades del cliente."
+            },
+            {
+              "role": "user",
+              "content": "hola"
+            }
+          ],
+          "client_info": {
+            "name": "Usuario de Prueba",
+            "company_name": "Empresa de Prueba",
+            "email": "test@example.com"
+          },
+          "agent_type": "router_agent",
+          "user_id": "test_user_1746222890267"
+        },
+        "output": {},
+        "metadata": {
+          "phase": "input"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:54:55.033788",
+        "agent_type": "router",
+        "input": {},
+        "output": {
+          "response": "\u00a1Hola! Bienvenido a TDX. Antes de continuar, necesito tu consentimiento para tratar tus datos personales seg\u00fan nuestra pol\u00edtica de privacidad. \u00bfEst\u00e1s de acuerdo?",
+          "intent_detected": "greeting",
+          "next_agent": "router",
+          "confidence": 0.9,
+          "delegated": false
+        },
+        "metadata": {
+          "phase": "output",
+          "delegated": false
+        }
+      }
+    ]
+  },
+  {
+    "session_id": "test_user_1746222977822_20250502215617",
+    "user_id": "test_user_1746222977822",
+    "start_time": "2025-05-02T21:56:17.866542",
+    "interactions": [
+      {
+        "timestamp": "2025-05-02T21:56:17.866968",
+        "agent_type": "router",
+        "input": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "Eres un asistente \u00fatil para TDX, una empresa de desarrollo tecnol\u00f3gico. Tu funci\u00f3n es saludar al cliente, comprender sus necesidades y dirigirlos al agente especializado adecuado. Pregunta por su nombre, empresa y una breve descripci\u00f3n de lo que est\u00e1n buscando. Debes ser amable, profesional y eficiente en la identificaci\u00f3n de las necesidades del cliente."
+            },
+            {
+              "role": "user",
+              "content": "hola"
+            }
+          ],
+          "client_info": {
+            "name": "Usuario de Prueba",
+            "company_name": "Empresa de Prueba",
+            "email": "test@example.com"
+          },
+          "agent_type": "router_agent",
+          "user_id": "test_user_1746222977822"
+        },
+        "output": {},
+        "metadata": {
+          "phase": "input"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:56:20.068708",
+        "agent_type": "router",
+        "input": {},
+        "output": {
+          "response": "Hola, bienvenido a TDX. Antes de continuar, necesito tu consentimiento para tratar tus datos personales seg\u00fan nuestra pol\u00edtica de privacidad. \u00bfEst\u00e1s de acuerdo?",
           "intent_detected": "greeting",
           "next_agent": "router",
           "confidence": 0.9,

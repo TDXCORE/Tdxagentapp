@@ -111,12 +111,14 @@ async def generate_prd(request: PRDRequest) -> PRDResponse:
             "content": "Based on our conversation, please generate a complete PRD document."
         })
         
-        # Call OpenAI API
-        response = openai.ChatCompletion.create(
+        # Call OpenAI API (usando asyncio.to_thread para evitar bloquear el event loop)
+        import asyncio
+        response = await asyncio.to_thread(
+            openai.ChatCompletion.create,
             model="gpt-4o",
             messages=messages,
             temperature=0.7,
-            max_tokens=4000
+            max_tokens=2000
         )
         
         # Extract the PRD content
@@ -133,11 +135,12 @@ async def generate_prd(request: PRDRequest) -> PRDResponse:
             "content": "Based on the PRD you generated, what are 3-5 important questions I should ask the client to improve the PRD?"
         })
         
-        follow_up_response = openai.ChatCompletion.create(
+        follow_up_response = await asyncio.to_thread(
+            openai.ChatCompletion.create,
             model="gpt-4o",
             messages=follow_up_messages,
             temperature=0.7,
-            max_tokens=1000
+            max_tokens=500
         )
         
         # Extract the suggested questions
@@ -152,8 +155,6 @@ async def generate_prd(request: PRDRequest) -> PRDResponse:
             suggested_questions = suggested_questions_text.split("\n")
             suggested_questions = [q for q in suggested_questions if "?" in q]
         
-        # Añadir el tag <<PRD_READY>> al final del contenido del PRD
-        prd_content += "\n\n<<PRD_READY>>"
         
         return PRDResponse(
             prd_content=prd_content,
@@ -161,6 +162,7 @@ async def generate_prd(request: PRDRequest) -> PRDResponse:
         )
         
     except Exception as e:
+        logger.exception("generate_prd failed")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

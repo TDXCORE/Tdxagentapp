@@ -203,7 +203,7 @@ async def chat(request: ChatRequest) -> ChatResponse:
             # Insertar etiqueta y resumen ANTES de delegar
             if intent in {'prd','qualification'} and '<<NEXT:' not in last_message:
                 short = last_message[:80]
-                request.messages.append(Message(role='assistant',
+                request.messages.append(Message(role='system',
                     content=f'Perfecto, necesitas una app: {short}. <<NEXT:PRD>>'))
                 logger.info(f"Añadida etiqueta <<NEXT:PRD>> con resumen: {short}")
             
@@ -268,134 +268,15 @@ async def chat(request: ChatRequest) -> ChatResponse:
             return response
         else:
             logger.info(f"Manejando directamente en el router para usuario {user_id}")
-            # Manejar directamente en el router para casos simples
-            # Esto es principalmente para la fase de CONSENT y mensajes iniciales
-            
-            # Llamar a OpenAI con límite de tokens reducido
-            response = openai.ChatCompletion.create(
-                model="gpt-4o",
+            return await handle_simple_flow(
+                user_id=user_id,
                 messages=messages,
-                temperature=0.7,
-                max_tokens=400  # Limitar tokens para respuestas más cortas
+                intent=intent,
+                current_phase=current_phase,
+                rag_context=rag_context,
+                last_message=last_message,
+                session_id=session_id
             )
-            
-            # Extraer texto de respuesta
-            response_text = response.choices[0].message.content
-            
-            # Truncar respuesta a máximo 6 líneas
-            response_text = '\n'.join(response_text.split('\n')[:6])
-            
-            # Determinar próximo agente
-            next_agent = "router"
-            if intent not in ["general", "greeting"]:
-                next_agent = intent
-                
-            # Añadir etiqueta <<NEXT:PRD>> y resumen corto si corresponde
-            if next_agent == "prd" and '<<NEXT:' not in last_message:  # evitar duplicar
-                short = last_message[:80]  # resumen corto
-                response_text = f"Perfecto, necesitas una app: {short}. <<NEXT:PRD>>"
-            
-            # Actualizar estado del cliente si es la fase de consentimiento
-            if current_phase == "CONSENT" and (is_consent_given(last_message) or intent == "consent_acceptance"):
-                if user_id:
-                    logger.info(f"Actualizando estado del cliente {user_id} - consentimiento dado")
-                    
-                    # IMPORTANTE: Forzar la actualización de la fase actual a QUALIFICATION
-                    current_phase = "QUALIFICATION"
-                    logger.info(f"Fase actualizada a: {current_phase}")
-                    
-                    # Modificar la respuesta para incluir preguntas de cualificación BANT
-                    if "gracias por tu consentimiento" in response_text.lower() and not any(word in response_text.lower() for word in ["presupuesto", "nombre", "empresa", "plazo"]):
-                        response_text += "\n\nPara ayudarte mejor con tu aplicación de inventario, ¿podrías compartir tu nombre y el de tu empresa?"
-                    
-                    try:
-                        # Intentar actualizar en Supabase
-                        updated_state = rag_system.update_client_state(
-                            user_id=user_id,
-                            state_update={
-                                "current_phase": "QUALIFICATION",
-                                "consent_given": True
-                            }
-                        )
-                        
-                        # Actualizar el contexto RAG
-                        if rag_context:
-                            if "client_state" in rag_context:
-                                rag_context["client_state"]["current_phase"] = "QUALIFICATION"
-                                rag_context["client_state"]["consent_given"] = True
-                            else:
-                                rag_context["client_state"] = {"current_phase": "QUALIFICATION", "consent_given": True}
-                            rag_context["current_phase"] = "QUALIFICATION"
-                        
-                        logger.info(f"Estado del cliente actualizado correctamente: {updated_state}")
-                    except Exception as update_error:
-                        logger.error(f"Error al actualizar estado del cliente: {update_error}")
-                        
-                        # Actualizar el contexto RAG en memoria
-                        if rag_context is None:
-                            rag_context = {
-                                "recent_conversations": [],
-                                "client_state": {"current_phase": "QUALIFICATION", "consent_given": True},
-                                "relevant_documents": [],
-                                "current_phase": "QUALIFICATION"
-                            }
-                        else:
-                            if "client_state" in rag_context:
-                                rag_context["client_state"]["current_phase"] = "QUALIFICATION"
-                                rag_context["client_state"]["consent_given"] = True
-                            else:
-                                rag_context["client_state"] = {"current_phase": "QUALIFICATION", "consent_given": True}
-                            rag_context["current_phase"] = "QUALIFICATION"
-                    
-                    # Después de actualizar el estado, forzar la delegación al orquestador
-                    # para la siguiente interacción del usuario
-                    next_agent = "prd"  # Asumimos que después del consentimiento, vamos a PRD
-                    logger.info(f"Después del consentimiento, estableciendo next_agent a: {next_agent}")
-            
-            # Almacenar interacción en RAG
-            if user_id:
-                logger.info(f"Almacenando interacción en RAG para usuario {user_id}")
-                try:
-                    interaction_id = rag_system.store_interaction(
-                        user_id=user_id,
-                        message=last_message,
-                        response=response_text,
-                        phase=current_phase,
-                        metadata={
-                            "intent": intent,
-                            "next_agent": next_agent,
-                            "delegated": False
-                        }
-                    )
-                    logger.info(f"Interacción almacenada con ID: {interaction_id}")
-                except Exception as rag_error:
-                    logger.error(f"Error al almacenar interacción en RAG: {rag_error}")
-                    # El error no es crítico, continuamos con el flujo
-            
-            # Crear respuesta
-            response = ChatResponse(
-                response=response_text,
-                intent_detected=intent,
-                next_agent=next_agent,
-                confidence=0.9
-            )
-            
-            # Registrar salida
-            agent_logger.log_interaction(
-                agent_type="router",
-                input_data={},  # Ya registrado anteriormente
-                output_data={
-                    "response": response_text,
-                    "intent_detected": intent,
-                    "next_agent": next_agent,
-                    "confidence": 0.9,
-                    "delegated": False
-                },
-                session_id=session_id,
-                metadata={"phase": "output", "delegated": False}
-            )
-            
-            return response
         
     except Exception as e:
         logger.error(f"Error en router: {str(e)}")
@@ -421,6 +302,8 @@ def detect_intent(text: str) -> str:
     text_lower = text.lower().strip()
     
     # Detectar tag especial <<NEXT:*>> y usarlo como intent directo
+    # Nota: Esta detección también ocurre en el orquestador, pero la mantenemos aquí
+    # como defensa en profundidad
     import re
     next_tag_match = re.search(r'<<NEXT:([a-zA-Z_]+)>>', text)
     if next_tag_match:
@@ -944,6 +827,165 @@ async def whatsapp_webhook(request: Request):
         )
         
         return {"status": "error", "message": str(e)}
+
+async def handle_simple_flow(
+    user_id: str,
+    messages: List[Message],
+    intent: str,
+    current_phase: str,
+    rag_context: Optional[Dict[str, Any]],
+    last_message: str,
+    session_id: Optional[str] = None
+) -> ChatResponse:
+    """
+    Maneja directamente en el router los casos simples.
+    Esto es principalmente para la fase de CONSENT y mensajes iniciales.
+    
+    Args:
+        user_id: ID del usuario
+        messages: Lista de mensajes
+        intent: Intención detectada
+        current_phase: Fase actual
+        rag_context: Contexto RAG
+        last_message: Último mensaje del usuario
+        session_id: ID de sesión
+        
+    Returns:
+        ChatResponse: Respuesta generada
+    """
+    # Llamar a OpenAI con límite de tokens reducido (usando asyncio.to_thread)
+    import asyncio
+    response = await asyncio.to_thread(
+        openai.ChatCompletion.create,
+        model="gpt-4o",
+        messages=messages,
+        temperature=0.7,
+        max_tokens=400  # Limitar tokens para respuestas más cortas
+    )
+    
+    # Extraer texto de respuesta
+    response_text = response.choices[0].message.content
+    
+    # Truncar respuesta a máximo 6 líneas
+    response_text = '\n'.join(response_text.split('\n')[:6])
+    
+    # Evitar que las respuestas se corten a medio punto
+    if len(response_text) >= 390:  # Si estamos cerca del límite
+        response_text = response_text.rstrip('.')
+        if not response_text.endswith('…'):
+            response_text += '…'
+    
+    # Determinar próximo agente
+    next_agent = "router"
+    if intent not in ["general", "greeting"]:
+        next_agent = intent
+        
+    # Añadir etiqueta <<NEXT:PRD>> y resumen corto si corresponde
+    if next_agent == "prd" and '<<NEXT:' not in last_message:  # evitar duplicar
+        short = last_message[:80]  # resumen corto
+        response_text = f"Perfecto, necesitas una app: {short}. <<NEXT:PRD>>"
+    
+    # Actualizar estado del cliente si es la fase de consentimiento
+    if current_phase == "CONSENT" and (is_consent_given(last_message) or intent == "consent_acceptance"):
+        if user_id:
+            logger.info(f"Actualizando estado del cliente {user_id} - consentimiento dado")
+            
+            # IMPORTANTE: Forzar la actualización de la fase actual a QUALIFICATION
+            current_phase = "QUALIFICATION"
+            logger.info(f"Fase actualizada a: {current_phase}")
+            
+            # Modificar la respuesta para incluir preguntas de cualificación BANT
+            if "gracias por tu consentimiento" in response_text.lower() and not any(word in response_text.lower() for word in ["presupuesto", "nombre", "empresa", "plazo"]):
+                response_text += "\n\nPara ayudarte mejor con tu aplicación de inventario, ¿podrías compartir tu nombre y el de tu empresa?"
+            
+            try:
+                # Intentar actualizar en Supabase
+                updated_state = rag_system.update_client_state(
+                    user_id=user_id,
+                    state_update={
+                        "current_phase": "QUALIFICATION",
+                        "consent_given": True
+                    }
+                )
+                
+                # Actualizar el contexto RAG
+                if rag_context:
+                    if "client_state" in rag_context:
+                        rag_context["client_state"]["current_phase"] = "QUALIFICATION"
+                        rag_context["client_state"]["consent_given"] = True
+                    else:
+                        rag_context["client_state"] = {"current_phase": "QUALIFICATION", "consent_given": True}
+                    rag_context["current_phase"] = "QUALIFICATION"
+                
+                logger.info(f"Estado del cliente actualizado correctamente: {updated_state}")
+            except Exception as update_error:
+                logger.error(f"Error al actualizar estado del cliente: {update_error}")
+                
+                # Actualizar el contexto RAG en memoria
+                if rag_context is None:
+                    rag_context = {
+                        "recent_conversations": [],
+                        "client_state": {"current_phase": "QUALIFICATION", "consent_given": True},
+                        "relevant_documents": [],
+                        "current_phase": "QUALIFICATION"
+                    }
+                else:
+                    if "client_state" in rag_context:
+                        rag_context["client_state"]["current_phase"] = "QUALIFICATION"
+                        rag_context["client_state"]["consent_given"] = True
+                    else:
+                        rag_context["client_state"] = {"current_phase": "QUALIFICATION", "consent_given": True}
+                    rag_context["current_phase"] = "QUALIFICATION"
+            
+            # Después de actualizar el estado, forzar la delegación al orquestador
+            # para la siguiente interacción del usuario
+            next_agent = "prd"  # Asumimos que después del consentimiento, vamos a PRD
+            logger.info(f"Después del consentimiento, estableciendo next_agent a: {next_agent}")
+    
+    # Almacenar interacción en RAG
+    if user_id:
+        logger.info(f"Almacenando interacción en RAG para usuario {user_id}")
+        try:
+            interaction_id = rag_system.store_interaction(
+                user_id=user_id,
+                message=last_message,
+                response=response_text,
+                phase=current_phase,
+                metadata={
+                    "intent": intent,
+                    "next_agent": next_agent,
+                    "delegated": False
+                }
+            )
+            logger.info(f"Interacción almacenada con ID: {interaction_id}")
+        except Exception as rag_error:
+            logger.error(f"Error al almacenar interacción en RAG: {rag_error}")
+            # El error no es crítico, continuamos con el flujo
+    
+    # Crear respuesta
+    response = ChatResponse(
+        response=response_text,
+        intent_detected=intent,
+        next_agent=next_agent,
+        confidence=0.9
+    )
+    
+    # Registrar salida
+    agent_logger.log_interaction(
+        agent_type="router",
+        input_data={},  # Ya registrado anteriormente
+        output_data={
+            "response": response_text,
+            "intent_detected": intent,
+            "next_agent": next_agent,
+            "confidence": 0.9,
+            "delegated": False
+        },
+        session_id=session_id,
+        metadata={"phase": "output", "delegated": False}
+    )
+    
+    return response
 
 if __name__ == "__main__":
     import uvicorn

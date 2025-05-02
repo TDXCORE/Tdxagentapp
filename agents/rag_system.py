@@ -55,14 +55,20 @@ class RAGSystem:
             Vector de embedding (lista de floats)
         """
         try:
+            # Limitar el texto a 8000 tokens para evitar que la API corte silenciosamente
+            # text-embedding-3-small tiene un límite de 8191 tokens
+            if len(text.split()) > 8000:
+                logger.warning(f"Texto demasiado largo para embedding, truncando a 8000 tokens")
+                text = ' '.join(text.split()[:8000])
+            
             response = openai.Embedding.create(
                 input=text,
-                model="text-embedding-3-small" 
+                model="text-embedding-3-small"
             )
             
             return response['data'][0]['embedding']
         except Exception as e:
-            logger.error(f"Error al crear embedding: {str(e)}")
+            logger.exception(f"Error al crear embedding")
             raise
     
     def _make_supabase_request(self, method, endpoint, data=None, params=None):
@@ -88,9 +94,36 @@ class RAGSystem:
             
             return response.json()
         except requests.exceptions.RequestException as e:
-            logger.warning(f"Error en solicitud a Supabase: {str(e)}")
+            logger.exception(f"Error en solicitud a Supabase")
             if hasattr(e, 'response') and e.response:
                 logger.debug(f"Detalles: {e.response.text}")
+            
+            # Implementar exponential backoff para reintentos
+            import time
+            import random
+            
+            # Máximo 3 reintentos con backoff exponencial
+            for retry in range(3):
+                try:
+                    # Esperar con backoff exponencial (2^retry * 100ms) + jitter aleatorio
+                    wait_time = (2 ** retry * 0.1) + (random.random() * 0.1)
+                    logger.info(f"Reintentando en {wait_time:.2f} segundos (intento {retry+1}/3)")
+                    time.sleep(wait_time)
+                    
+                    # Reintentar la solicitud
+                    if method == "GET":
+                        response = requests.get(url, headers=headers, params=params)
+                    elif method == "POST":
+                        response = requests.post(url, headers=headers, json=data)
+                    elif method == "PUT":
+                        response = requests.put(url, headers=headers, json=data)
+                    
+                    response.raise_for_status()
+                    return response.json()
+                except requests.exceptions.RequestException as retry_e:
+                    logger.warning(f"Reintento {retry+1} fallido: {str(retry_e)}")
+            
+            # Si llegamos aquí, todos los reintentos fallaron
             raise
     
     def store_interaction(self,
@@ -142,7 +175,7 @@ class RAGSystem:
                 logger.info(f"Interacción almacenada correctamente para el usuario {user_id}")
                 return result
             except Exception as e:
-                logger.debug(f"Error al almacenar interacción: {str(e)}")
+                logger.exception(f"Error al almacenar interacción")
                 logger.info("Generando ID local para la interacción")
                 # Devolver un ID falso para no interrumpir el flujo
                 import uuid
@@ -192,7 +225,7 @@ class RAGSystem:
             try:
                 result = self._make_supabase_request("POST", "/rest/v1/rpc/match_conversation_embeddings", data=params)
             except Exception as e:
-                logger.debug(f"Error al buscar conversaciones similares (posiblemente la tabla no existe): {str(e)}")
+                logger.exception(f"Error al buscar conversaciones similares (posiblemente la tabla no existe)")
                 logger.info("Usando resultados vacíos para conversaciones similares")
                 result = []
             
@@ -203,7 +236,7 @@ class RAGSystem:
             try:
                 documents = self._get_relevant_documents(user_id, phase)
             except Exception as e:
-                logger.debug(f"Error al recuperar documentos relevantes (posiblemente la tabla no existe): {str(e)}")
+                logger.exception(f"Error al recuperar documentos relevantes (posiblemente la tabla no existe)")
                 logger.info("Usando lista vacía para documentos relevantes")
                 documents = []
             
@@ -219,7 +252,7 @@ class RAGSystem:
             
             return context
         except Exception as e:
-            logger.debug(f"Error al recuperar contexto relevante: {str(e)}")
+            logger.exception(f"Error al recuperar contexto relevante")
             logger.info("Usando contexto vacío por defecto")
             # En caso de error, devolver un contexto vacío pero válido
             return {
@@ -254,7 +287,7 @@ class RAGSystem:
                 "data": {}
             }
         except Exception as e:
-            logger.debug(f"Error al recuperar estado del cliente: {str(e)}")
+            logger.exception(f"Error al recuperar estado del cliente")
             logger.info(f"Usando estado por defecto para el cliente {user_id}")
             # En caso de error, devolver un estado por defecto
             return {
@@ -292,7 +325,7 @@ class RAGSystem:
             
             return result or []
         except Exception as e:
-            logger.debug(f"Error al recuperar documentos relevantes: {str(e)}")
+            logger.exception(f"Error al recuperar documentos relevantes")
             logger.info("Usando lista vacía de documentos")
             return []
     
@@ -349,7 +382,7 @@ class RAGSystem:
                     self._make_supabase_request("POST", "/rest/v1/client_states", data=updated_state)
                     logger.info(f"Nuevo estado creado para el cliente {user_id}")
             except Exception as e:
-                logger.debug(f"Error al actualizar estado del cliente en la base de datos: {str(e)}")
+                logger.exception(f"Error al actualizar estado del cliente en la base de datos")
                 # Almacenar el estado actualizado en memoria para no interrumpir el flujo
                 logger.info(f"Usando almacenamiento en memoria para el cliente {user_id}")
                 # Añadir el estado actualizado a las actualizaciones
@@ -359,7 +392,7 @@ class RAGSystem:
             # Siempre retornar el estado actualizado, incluso si hubo error en la base de datos
             return updated_state
         except Exception as e:
-            logger.debug(f"Error al actualizar estado del cliente: {str(e)}")
+            logger.exception(f"Error al actualizar estado del cliente")
             logger.info(f"Usando estado básico para el cliente {user_id}")
             # Devolver un estado básico para no interrumpir el flujo
             return {

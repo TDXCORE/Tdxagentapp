@@ -7,8 +7,7 @@ from dotenv import load_dotenv
 import logging
 from .rag_system import rag_system
 from .logger_system import agent_logger
-import evaluator  # Importar el módulo evaluador correctamente
-from evaluator import EvaluationRequest  # Importar la clase EvaluationRequest
+from .evaluator import evaluate_conversation, EvaluationRequest  # Importar correctamente desde el módulo local
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -108,9 +107,11 @@ async def orchestrate(request: Request) -> OrchestratorResponse:
             
             # Detectar etiquetas <<NEXT:*>> en los mensajes
             import re
-            tag = next((re.search(r'<<NEXT:([A-Z_]+)>>', m.get("content", "")) for m in messages if '<<NEXT:' in m.get("content", "")), None)
+            tag = next((m for m in messages if '<<NEXT:' in m.get("content", "")), None)
             if tag:  # ruta directa
-                next_agent = tag.group(1).lower()
+                match = re.search(r'<<NEXT:([A-Z_]+)>>', tag.get("content", ""))
+                if match:
+                    next_agent = match.group(1).lower()
                 logger.info(f"Tag <<NEXT:{next_agent}>> detectado, usando como ruta directa")
                 return OrchestratorResponse(
                     next_agent=next_agent,
@@ -183,8 +184,10 @@ async def orchestrate(request: Request) -> OrchestratorResponse:
             "content": "Based on this conversation, which agent should handle the next part? Respond with the agent name, confidence score, and reasoning."
         })
         
-        # Call OpenAI API
-        response = openai.ChatCompletion.create(
+        # Call OpenAI API (usando asyncio.to_thread para evitar bloquear el event loop)
+        import asyncio
+        response = await asyncio.to_thread(
+            openai.ChatCompletion.create,
             model="gpt-4o",
             messages=orchestrator_messages,
             temperature=0.3,
@@ -233,13 +236,17 @@ async def orchestrate(request: Request) -> OrchestratorResponse:
         if len(reason_text) > 1:
             reason = reason_text[1].strip()
         
-        # Generar una respuesta para el cliente basada en el agente seleccionado
-        response_content = await generate_response_for_client(
-            next_agent=next_agent,
-            messages=messages,
-            current_phase=current_phase,
-            rag_context=rag_context
-        )
+        # Inicializar response_content
+        response_content = ''
+        
+        # Generar una respuesta para el cliente solo si el siguiente agente es router
+        if next_agent == 'router':
+            response_content = await generate_response_for_client(
+                next_agent=next_agent,
+                messages=messages,
+                current_phase=current_phase,
+                rag_context=rag_context
+            )
         
         # Actualizar la fase del cliente si es necesario
         if user_id:
@@ -256,11 +263,6 @@ async def orchestrate(request: Request) -> OrchestratorResponse:
                     )
             except Exception as e:
                 logger.error(f"Error al actualizar fase del cliente: {str(e)}")
-        
-        # Si next_agent no es router, establecer response_content a cadena vacía
-        if next_agent != 'router':
-            logger.info(f"Estableciendo response_content a cadena vacía para agente: {next_agent}")
-            response_content = ''
         
         # Crear respuesta
         response = OrchestratorResponse(
@@ -289,8 +291,8 @@ async def orchestrate(request: Request) -> OrchestratorResponse:
         if next_agent in {'prd', 'quotation', 'contract', 'meeting'}:
             try:
                 logger.info(f"Llamando al evaluator para agente: {next_agent}")
-                # Crear el objeto EvaluationRequest y usar await
-                await evaluator.evaluate_conversation(
+                # Crear el objeto EvaluationRequest y llamar directamente a la función
+                await evaluate_conversation(
                     EvaluationRequest(
                         conversation_history=[Message(**m) for m in messages],
                         agent_type=next_agent
@@ -415,8 +417,10 @@ async def generate_response_for_client(
             {"role": "user", "content": last_message}
         ]
         
-        # Llamar a OpenAI API
-        response = openai.ChatCompletion.create(
+        # Llamar a OpenAI API (usando asyncio.to_thread para evitar bloquear el event loop)
+        import asyncio
+        response = await asyncio.to_thread(
+            openai.ChatCompletion.create,
             model="gpt-4o",
             messages=messages_for_api,
             temperature=0.7,

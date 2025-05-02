@@ -12,6 +12,9 @@ logger = logging.getLogger("agent_logger")
 LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "logs")
 os.makedirs(LOG_DIR, exist_ok=True)
 
+# Configurar un rotating file handler para logs
+from logging.handlers import RotatingFileHandler
+
 class AgentLogger:
     """
     Sistema de logging para registrar todas las interacciones de los agentes.
@@ -24,12 +27,11 @@ class AgentLogger:
         self.current_session_id = None
         
         # Asegurar que el directorio de logs existe
-        self.log_file_path = os.path.join(LOG_DIR, f"agent_logs_{datetime.now().strftime('%Y%m%d')}.json")
+        self.log_file_path = os.path.join(LOG_DIR, f"agent_logs_{datetime.now().strftime('%Y%m%d')}.jsonl")
         
-        # Crear archivo de logs si no existe
+        # Inicializar archivo de logs en formato JSONL (JSON Lines)
         if not os.path.exists(self.log_file_path):
-            with open(self.log_file_path, 'w') as f:
-                json.dump([], f)
+            open(self.log_file_path, 'a').close()  # Crear archivo vacío
     
     def start_session(self, user_id: str) -> str:
         """
@@ -137,38 +139,41 @@ class AgentLogger:
     
     def _save_to_file(self, session_id: str) -> None:
         """
-        Guarda los logs de una sesión en un archivo.
+        Guarda los logs de una sesión en un archivo usando formato JSONL (JSON Lines).
+        Cada línea es un objeto JSON independiente, lo que permite añadir entradas
+        sin tener que leer/escribir todo el archivo.
         
         Args:
             session_id: ID de la sesión
         """
         try:
-            # Leer logs existentes
-            existing_logs = []
-            try:
-                with open(self.log_file_path, 'r') as f:
-                    existing_logs = json.load(f)
-            except (json.JSONDecodeError, FileNotFoundError):
-                existing_logs = []
-            
-            # Buscar si ya existe esta sesión
-            session_found = False
-            for i, log in enumerate(existing_logs):
-                if log.get("session_id") == session_id:
-                    existing_logs[i] = self.session_logs[session_id]
-                    session_found = True
-                    break
-            
-            # Si no existe, añadirla
-            if not session_found:
-                existing_logs.append(self.session_logs[session_id])
-            
-            # Guardar logs actualizados
-            with open(self.log_file_path, 'w') as f:
-                json.dump(existing_logs, f, indent=2)
+            # Obtener la última interacción añadida
+            if session_id in self.session_logs and self.session_logs[session_id]["interactions"]:
+                latest_interaction = self.session_logs[session_id]["interactions"][-1]
+                
+                # Crear un registro completo con metadatos de la sesión
+                log_entry = {
+                    "session_id": session_id,
+                    "user_id": self.session_logs[session_id]["user_id"],
+                    "timestamp": datetime.now().isoformat(),
+                    "interaction": latest_interaction
+                }
+                
+                # Añadir al archivo como una nueva línea (append)
+                with open(self.log_file_path, 'a') as f:
+                    f.write(json.dumps(log_entry) + '\n')
         
         except Exception as e:
-            logger.error(f"Error al guardar logs en archivo: {str(e)}")
+            logger.exception(f"Error al guardar logs en archivo")
+            
+    def get_current_session_id(self) -> Optional[str]:
+        """
+        Obtiene el ID de la sesión actual.
+        
+        Returns:
+            str: ID de la sesión actual o None si no hay sesión activa
+        """
+        return self.current_session_id
 
 # Instancia global para uso en la aplicación
 agent_logger = AgentLogger()
