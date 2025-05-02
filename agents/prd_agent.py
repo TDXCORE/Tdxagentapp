@@ -89,6 +89,8 @@ async def generate_prd(request: PRDRequest) -> PRDResponse:
         6. Key stakeholders
         
         Your PRD should be professional, detailed, and ready for client review.
+        
+        IMPORTANTE: Al final del documento, añade el tag <<PRD_READY>> para indicar que el PRD está listo para revisión.
         """
         
         # Prepare messages for the API call
@@ -140,6 +142,9 @@ async def generate_prd(request: PRDRequest) -> PRDResponse:
             # If the format wasn't as expected, try to extract questions another way
             suggested_questions = suggested_questions_text.split("\n")
             suggested_questions = [q for q in suggested_questions if "?" in q]
+        
+        # Añadir el tag <<PRD_READY>> al final del contenido del PRD
+        prd_content += "\n\n<<PRD_READY>>"
         
         return PRDResponse(
             prd_content=prd_content,

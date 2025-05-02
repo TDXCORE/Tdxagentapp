@@ -1,5 +1,8 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
+// Tipo personalizado para vectores (pgvector)
+export type Vector = number[]
+
 export interface Database {
   public: {
     Tables: {
@@ -231,6 +234,125 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+      }
+      client_states: {
+        Row: {
+          id: string
+          user_id: string
+          current_phase: string
+          data: Json
+          created_at: string
+          updated_at: string
+          consent_given?: boolean
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          current_phase?: string
+          data?: Json
+          created_at?: string
+          updated_at?: string
+          consent_given?: boolean
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          current_phase?: string
+          data?: Json
+          created_at?: string
+          updated_at?: string
+          consent_given?: boolean
+        }
+      }
+      conversation_embeddings: {
+        Row: {
+          id: string
+          user_id: string
+          content: string
+          response: string
+          phase: string
+          metadata: Json
+          created_at: string
+          embedding: Vector
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          content: string
+          response: string
+          phase: string
+          metadata?: Json
+          created_at?: string
+          embedding: Vector
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          content?: string
+          response?: string
+          phase?: string
+          metadata?: Json
+          created_at?: string
+          embedding?: Vector
+        }
+      }
+      documents: {
+        Row: {
+          id: string
+          client_id: string
+          type: string
+          title: string
+          content: string
+          url: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          client_id: string
+          type: string
+          title: string
+          content: string
+          url?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          client_id?: string
+          type?: string
+          title?: string
+          content?: string
+          url?: string | null
+          created_at?: string
+        }
+      }
+    }
+    Functions: {
+      insert_conversation_embedding: {
+        Args: {
+          user_id: string
+          content: string
+          response: string
+          phase: string
+          metadata: Json
+          embedding: Vector
+        }
+        Returns: string
+      }
+      match_conversation_embeddings: {
+        Args: {
+          query_embedding: Vector
+          match_threshold: number
+          match_count: number
+          user_id: string
+          filter_phase?: string
+        }
+        Returns: {
+          id: string
+          content: string
+          response: string
+          phase: string
+          similarity: number
+        }[]
       }
     }
   }

@@ -4,6 +4,7 @@ export type ProjectStatus = "draft" | "active" | "completed" | "canceled"
 export type QuotationStatus = "pending" | "sent" | "approved" | "rejected"
 export type ContractStatus = "draft" | "sent" | "signed" | "rejected"
 export type UserRole = "admin" | "sales" | "legal" | "tech"
+export type ClientPhase = "CONSENT" | "PRD" | "QUOTATION" | "CONTRACT" | "MEETING"
 
 export interface Client {
   id: string
@@ -82,4 +83,35 @@ export interface AgentSetting {
   max_tokens: number
   created_at: string
   updated_at: string
+}
+
+export interface ClientState {
+  id: string
+  user_id: string
+  current_phase: ClientPhase
+  data: Record<string, any>
+  created_at: string
+  updated_at: string
+  consent_given?: boolean
+}
+
+export interface ConversationEmbedding {
+  id: string
+  user_id: string
+  content: string
+  response: string
+  phase: ClientPhase
+  metadata: Record<string, any>
+  created_at: string
+  embedding: number[]
+}
+
+export interface Document {
+  id: string
+  client_id: string
+  type: string
+  title: string
+  content: string
+  url: string | null
+  created_at: string
 }

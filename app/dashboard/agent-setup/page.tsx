@@ -1,18 +1,18 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { 
-  Card, 
+import {
+  Card,
   CardContent
 } from "@/components/ui/card"
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from "@/components/ui/select"
-import { 
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -38,7 +38,8 @@ import {
   SquareTerminal,
   Info,
   MoreVertical,
-  Copy
+  Copy,
+  List
 } from "lucide-react"
 
 // Lista de agentes predefinidos
@@ -92,6 +93,11 @@ export default function AgentSetupPage() {
   const [inputMessage, setInputMessage] = useState<string>("")
   const [isLoading, setIsLoading] = useState<boolean>(false)
   
+  // Estado para los logs
+  const [logs, setLogs] = useState<any[]>([])
+  const [isLogsOpen, setIsLogsOpen] = useState<boolean>(false)
+  const [isLoadingLogs, setIsLoadingLogs] = useState<boolean>(false)
+  
   const { toast } = useToast()
   const supabase = createClient()
 
@@ -122,92 +128,16 @@ export default function AgentSetupPage() {
       setApiVersion("Latest");
       setLastUpdated("4/9, 2:15 PM");
       
-      // Buscar la configuración del agente en la base de datos
-      try {
-        // Primero intentamos obtener solo system_instructions y agent_type
-        // que son las columnas más importantes y que probablemente existan
-        const { data: basicConfig, error: basicError } = await supabase
-          .from("agent_settings")
-          .select("agent_type, system_instructions, updated_at")
-          .eq("agent_type", agentName)
-          .maybeSingle();
-        
-        if (basicError && basicError.code !== 'PGRST116') {
-          console.error("Error al cargar la configuración básica del agente:", basicError);
-        } else if (basicConfig) {
-          // Si encontramos la configuración básica, la usamos
-          if (basicConfig.system_instructions) {
-            setSystemInstructions(basicConfig.system_instructions);
-          }
-          
-          if (basicConfig.updated_at) {
-            setLastUpdated(formatDate(new Date(basicConfig.updated_at)));
-          }
-          
-          // Ahora intentamos cargar el resto de la configuración
-          try {
-            const { data: fullConfig, error: fullError } = await supabase
-              .from("agent_settings")
-              .select("*")
-              .eq("agent_type", agentName)
-              .single();
-            
-            if (fullError) {
-              console.warn("Advertencia al cargar la configuración completa:", fullError);
-            } else if (fullConfig) {
-              // Cargar cada campo individualmente para manejar posibles campos faltantes
-              if (fullConfig.assistant_id) setAssistantId(fullConfig.assistant_id);
-              if (fullConfig.model) setModel(fullConfig.model);
-              if (fullConfig.file_search !== undefined) setFileSearch(fullConfig.file_search);
-              if (fullConfig.code_interpreter !== undefined) setCodeInterpreter(fullConfig.code_interpreter);
-              if (fullConfig.functions_enabled !== undefined) setFunctions(fullConfig.functions_enabled);
-              if (fullConfig.response_format) setResponseFormat(fullConfig.response_format);
-              if (fullConfig.temperature !== undefined) setTemperature(fullConfig.temperature);
-              if (fullConfig.top_p !== undefined) setTopP(fullConfig.top_p);
-              if (fullConfig.api_version) setApiVersion(fullConfig.api_version);
-              
-              // Convertir function_definitions de string a objeto si es necesario
-              if (fullConfig.function_definitions) {
-                try {
-                  let functionDefs = [];
-                  if (typeof fullConfig.function_definitions === 'string') {
-                    functionDefs = JSON.parse(fullConfig.function_definitions);
-                  } else {
-                    functionDefs = fullConfig.function_definitions;
-                  }
-                  setFunctionDefinitions(functionDefs);
-                } catch (e) {
-                  console.error("Error al parsear function_definitions:", e);
-                }
-              }
-            }
-          } catch (e) {
-            console.warn("Error al cargar la configuración completa:", e);
-          }
-        } else {
-          // Si no encontramos la configuración, creamos una nueva con valores predeterminados
-          try {
-            const newAgentData = {
-              agent_type: agentName,
-              system_instructions: getDefaultInstructions(agentName),
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            };
-            
-            const { error: insertError } = await supabase
-              .from("agent_settings")
-              .insert([newAgentData]);
-            
-            if (insertError) {
-              console.warn("Error al crear configuración predeterminada:", insertError);
-            }
-          } catch (e) {
-            console.warn("Error al crear configuración predeterminada:", e);
-          }
-        }
-      } catch (e) {
-        console.warn("Error general al cargar la configuración:", e);
-      }
+      // Usar valores predeterminados sin intentar acceder a la base de datos
+      // Esto evita errores cuando la tabla está vacía o no tiene la estructura esperada
+      console.log(`Usando configuración predeterminada para el agente: ${agentName}`);
+      
+      // Establecer las instrucciones predeterminadas según el tipo de agente
+      const defaultInstructions = getDefaultInstructions(agentName);
+      setSystemInstructions(defaultInstructions);
+      
+      // No intentamos guardar en la base de datos para evitar errores
+      // Si en el futuro se necesita guardar, el usuario puede usar el botón "Save Instructions"
       
     } catch (error) {
       console.error("Error al cargar la configuración del agente:", error)
@@ -452,7 +382,10 @@ export default function AgentSetupPage() {
       // Preparar los mensajes para la API
       const apiMessages = [systemMessage, ...updatedMessages];
       
-      // Llamar a la API de OpenAI
+      // Generar un ID de usuario para pruebas
+      const testUserId = `test_user_${Date.now()}`;
+      
+      // Llamar a la API de chat
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -461,7 +394,14 @@ export default function AgentSetupPage() {
           model: model,
           temperature: temperature,
           top_p: topP,
-          functions: functions ? functionDefinitions : undefined
+          functions: functions ? functionDefinitions : undefined,
+          agent_type: selectedAgent,
+          user_id: testUserId,
+          client_info: {
+            name: "Usuario de Prueba",
+            company_name: "Empresa de Prueba",
+            email: "test@example.com"
+          }
         })
       });
       
@@ -486,6 +426,10 @@ export default function AgentSetupPage() {
       };
       
       setMessages([...updatedMessages, assistantMessage]);
+      
+      // Intentar cargar los logs después de cada interacción
+      fetchLogs();
+      
       setIsLoading(false);
     } catch (error) {
       console.error("Error al enviar mensaje:", error);
@@ -495,6 +439,44 @@ export default function AgentSetupPage() {
         description: "No se pudo enviar el mensaje",
         variant: "destructive",
       });
+    }
+  };
+  
+  // Función para cargar los logs
+  const fetchLogs = async () => {
+    try {
+      setIsLoadingLogs(true);
+      
+      // Llamar a la API de logs real
+      const response = await fetch('/api/logs', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error al obtener logs: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.logs && Array.isArray(data.logs)) {
+        console.log(`Recibidos ${data.logs.length} logs del servidor`);
+        setLogs(data.logs);
+      } else {
+        console.warn("No se recibieron logs válidos del servidor");
+        setLogs([]);
+      }
+      
+      setIsLoadingLogs(false);
+    } catch (error) {
+      console.error("Error al cargar logs:", error);
+      toast({
+        title: "Error al cargar logs",
+        description: "No se pudieron cargar los logs del sistema. Por favor, intenta de nuevo.",
+        variant: "destructive",
+      });
+      setLogs([]);
+      setIsLoadingLogs(false);
     }
   };
 
@@ -815,9 +797,87 @@ export default function AgentSetupPage() {
                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                   <FileText className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="sm" className="h-8 p-2 flex items-center">
-                  <span>Logs</span>
-                </Button>
+                <Dialog open={isLogsOpen} onOpenChange={setIsLogsOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 p-2 flex items-center"
+                      onClick={() => {
+                        setIsLogsOpen(true);
+                        fetchLogs();
+                      }}
+                    >
+                      <List className="h-4 w-4 mr-1" />
+                      <span>Logs</span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Logs del Sistema de Agentes</DialogTitle>
+                      <DialogDescription>
+                        Registro detallado de las interacciones entre agentes
+                      </DialogDescription>
+                    </DialogHeader>
+                    
+                    {isLoadingLogs ? (
+                      <div className="flex justify-center items-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                      </div>
+                    ) : logs.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500">
+                        No hay logs disponibles
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {logs.map((log, index) => (
+                          <div key={index} className="border rounded-lg p-4">
+                            <div className="flex justify-between items-center mb-2">
+                              <div className="font-medium">{log.agent_type}</div>
+                              <div className="text-sm text-gray-500">{new Date(log.timestamp).toLocaleString()}</div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <div className="text-sm font-medium mb-1">Input:</div>
+                                <pre className="text-xs bg-gray-100 p-2 rounded overflow-auto max-h-40">
+                                  {JSON.stringify(log.input, null, 2)}
+                                </pre>
+                              </div>
+                              <div>
+                                <div className="text-sm font-medium mb-1">Output:</div>
+                                <pre className="text-xs bg-gray-100 p-2 rounded overflow-auto max-h-40">
+                                  {JSON.stringify(log.output, null, 2)}
+                                </pre>
+                              </div>
+                            </div>
+                            {log.metadata && (
+                              <div className="mt-2">
+                                <div className="text-sm font-medium mb-1">Metadata:</div>
+                                <div className="text-xs text-gray-600">
+                                  <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
+                                    Phase: {log.metadata.phase}
+                                  </span>
+                                  {log.metadata.delegated !== undefined && (
+                                    <span className={`ml-2 ${log.metadata.delegated ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'} px-2 py-0.5 rounded`}>
+                                      {log.metadata.delegated ? 'Delegated' : 'Direct'}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    <DialogFooter>
+                      <Button onClick={() => fetchLogs()}>Actualizar</Button>
+                      <Button variant="outline" onClick={() => setIsLogsOpen(false)}>
+                        Cerrar
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
             
