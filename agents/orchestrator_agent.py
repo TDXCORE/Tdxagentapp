@@ -8,6 +8,7 @@ import logging
 from .rag_system import rag_system
 from .logger_system import agent_logger
 import evaluator  # Importar el módulo evaluador correctamente
+from evaluator import EvaluationRequest  # Importar la clase EvaluationRequest
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -288,9 +289,12 @@ async def orchestrate(request: Request) -> OrchestratorResponse:
         if next_agent in {'prd', 'quotation', 'contract', 'meeting'}:
             try:
                 logger.info(f"Llamando al evaluator para agente: {next_agent}")
-                evaluator.evaluate_conversation(
-                    conversation_history=[Message(**m) for m in messages],
-                    agent_type=next_agent
+                # Crear el objeto EvaluationRequest y usar await
+                await evaluator.evaluate_conversation(
+                    EvaluationRequest(
+                        conversation_history=[Message(**m) for m in messages],
+                        agent_type=next_agent
+                    )
                 )
                 logger.info("Evaluación completada")
             except Exception as eval_error:

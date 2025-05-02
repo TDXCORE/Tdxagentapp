@@ -6515,6 +6515,174 @@
         "metadata": {
           "phase": "output"
         }
+      },
+      {
+        "timestamp": "2025-05-02T21:07:03.859440",
+        "agent_type": "orchestrator",
+        "input": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "Eres un especialista en contratos para TDX. Tu funci\u00f3n es explicar t\u00e9rminos contractuales, responder preguntas legales y ayudar en la fase de contrataci\u00f3n. Debes asegurarte de que todos los contratos cumplan con la normativa legal vigente y protejan los intereses de todas las partes involucradas."
+            },
+            {
+              "role": "user",
+              "content": "hola como estas"
+            }
+          ],
+          "client_info": {
+            "name": "Usuario de Prueba",
+            "company_name": "Empresa de Prueba",
+            "email": "test@example.com"
+          },
+          "current_agent": "router",
+          "intent_detected": "general",
+          "user_id": "test_user_1746220021615"
+        },
+        "output": {},
+        "metadata": {
+          "phase": "input"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:07:08.650296",
+        "agent_type": "response_generator_prd",
+        "input": {
+          "next_agent": "prd",
+          "messages": [
+            {
+              "role": "system",
+              "content": "Eres un especialista en contratos para TDX. Tu funci\u00f3n es explicar t\u00e9rminos contractuales, responder preguntas legales y ayudar en la fase de contrataci\u00f3n. Debes asegurarte de que todos los contratos cumplan con la normativa legal vigente y protejan los intereses de todas las partes involucradas."
+            },
+            {
+              "role": "user",
+              "content": "hola como estas"
+            }
+          ],
+          "current_phase": "CONSENT"
+        },
+        "output": {},
+        "metadata": {
+          "phase": "generation_start"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:07:09.810488",
+        "agent_type": "response_generator_prd",
+        "input": {},
+        "output": {
+          "response": "\u00a1Hola! Estoy aqu\u00ed para ayudarte con lo que necesites. \u00bfEn qu\u00e9 puedo asistirte hoy en relaci\u00f3n a los ..."
+        },
+        "metadata": {
+          "phase": "generation_complete"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:07:10.064901",
+        "agent_type": "orchestrator",
+        "input": {},
+        "output": {
+          "next_agent": "prd",
+          "confidence": 0.8,
+          "reason": "the conversation is currently in the \"consent\" phase, which typically involves gathering more detailed information about the client's needs and requirements before moving forward with pricing or contract discussions. the detected intent is \"general,\" which suggests that the client might be inquiring about the services or products offered by tdx. the prd agent is best suited to handle this next step as they can gather detailed requirements from the client to create a product requirements document (prd), which is essential before moving on to pricing or contract discussions.",
+          "current_phase": "CONSENT",
+          "response_content": "\u00a1Hola! Estoy aqu\u00ed para ayudarte con lo que necesites. \u00bfEn qu\u00e9 puedo asistirte hoy en relaci\u00f3n a los ..."
+        },
+        "metadata": {
+          "phase": "output"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:07:50.024335",
+        "agent_type": "orchestrator",
+        "input": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "Eres un especialista en contratos para TDX. Tu funci\u00f3n es explicar t\u00e9rminos contractuales, responder preguntas legales y ayudar en la fase de contrataci\u00f3n. Debes asegurarte de que todos los contratos cumplan con la normativa legal vigente y protejan los intereses de todas las partes involucradas."
+            },
+            {
+              "role": "user",
+              "content": "hola como estas"
+            },
+            {
+              "role": "assistant",
+              "content": "\u00a1Hola! Estoy aqu\u00ed para ayudarte con lo que necesites. \u00bfEn qu\u00e9 puedo asistirte hoy en relaci\u00f3n a los requisitos de tu proyecto?"
+            },
+            {
+              "role": "user",
+              "content": "quiero una aplicacion de helado digitales y que este integrada con whatsapp y emails"
+            }
+          ],
+          "client_info": {
+            "name": "Usuario de Prueba",
+            "company_name": "Empresa de Prueba",
+            "email": "test@example.com"
+          },
+          "current_agent": "router",
+          "intent_detected": "prd",
+          "user_id": "test_user_1746220068670"
+        },
+        "output": {},
+        "metadata": {
+          "phase": "input"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:07:52.752630",
+        "agent_type": "response_generator_prd",
+        "input": {
+          "next_agent": "prd",
+          "messages": [
+            {
+              "role": "system",
+              "content": "Eres un especialista en contratos para TDX. Tu funci\u00f3n es explicar t\u00e9rminos contractuales, responder preguntas legales y ayudar en la fase de contrataci\u00f3n. Debes asegurarte de que todos los contratos cumplan con la normativa legal vigente y protejan los intereses de todas las partes involucradas."
+            },
+            {
+              "role": "user",
+              "content": "hola como estas"
+            },
+            {
+              "role": "assistant",
+              "content": "\u00a1Hola! Estoy aqu\u00ed para ayudarte con lo que necesites. \u00bfEn qu\u00e9 puedo asistirte hoy en relaci\u00f3n a los requisitos de tu proyecto?"
+            },
+            {
+              "role": "user",
+              "content": "quiero una aplicacion de helado digitales y que este integrada con whatsapp y emails"
+            }
+          ],
+          "current_phase": "CONSENT"
+        },
+        "output": {},
+        "metadata": {
+          "phase": "generation_start"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:07:58.872840",
+        "agent_type": "response_generator_prd",
+        "input": {},
+        "output": {
+          "response": "\u00a1Eso suena emocionante! Crear una aplicaci\u00f3n de helados digitales integrada con WhatsApp y correo el..."
+        },
+        "metadata": {
+          "phase": "generation_complete"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:07:59.162148",
+        "agent_type": "orchestrator",
+        "input": {},
+        "output": {
+          "next_agent": "prd",
+          "confidence": 0.8,
+          "reason": "the client has expressed a specific need for an application that integrates with whatsapp and emails, which indicates a requirement gathering phase. the detected intent is \"prd,\" which aligns with the need to gather detailed requirements and create a product requirements document (prd). the prd agent is best suited to handle this part of the conversation to capture all the necessary details for the application development.",
+          "current_phase": "CONSENT",
+          "response_content": "\u00a1Eso suena emocionante! Crear una aplicaci\u00f3n de helados digitales integrada con WhatsApp y correo el..."
+        },
+        "metadata": {
+          "phase": "output"
+        }
       }
     ]
   },
@@ -9897,6 +10065,316 @@
         "input": {},
         "output": {
           "response": "\u00a1Eso suena como un proyecto emocionante! Para ayudarte mejor, necesitar\u00eda entender m\u00e1s sobre tus necesidades y objetivos. Aqu\u00ed tienes algunas preguntas para comenzar:\n\n1. **\u00bfCu\u00e1l es la funcionalidad principal que esperas de la aplicaci\u00f3n de helados digitales?** \n   - \u00bfEst\u00e1s pensando en una tienda en l\u00ednea para pedidos de helados, un cat\u00e1logo de productos, o algo m\u00e1s?\n\n2. **Sobre la integraci\u00f3n con WhatsApp:**\n   - \u00bfC\u00f3mo imaginas que se integre WhatsApp con tu aplicaci\u00f3n? Por ejemplo, \u00bfte gustar\u00eda que los clientes pudieran hacer pedidos directamente a trav\u00e9s de WhatsApp o recibir confirmaciones de pedidos?\n\n3. **Para las notificaciones por correo:**\n   - \u00bfQu\u00e9 tipo de notificaciones te gustar\u00eda enviar a los usuarios? Por ejemplo, confirmaciones de pedidos, promociones, actualizaciones de estado de env\u00edo, etc.\n\n4. **\u00bfTienes ya una plataforma o sistema actual con el que esta aplicaci\u00f3n necesite integrarse, o ser\u00eda algo completamente nuevo?**\n\n5. **\u00bfCu\u00e1l es tu p\u00fablico objetivo para esta aplicaci\u00f3n?** \n   - \u00bfSon clientes individuales, distribuidores, o quiz\u00e1s ambos?\n\n6. **\u00bfTienes alguna preferencia sobre la tecnolog\u00eda o plataforma que se utilizar\u00eda para desarrollar esta aplicaci\u00f3n?**\n\nCon esta informaci\u00f3n, podremos definir mejor los requisitos y asegurarnos de que la soluci\u00f3n propuesta se ajuste perfectamente a tus necesidades. \u00a1Espero tus respuestas!",
+          "intent_detected": "prd",
+          "next_agent": "prd",
+          "confidence": 0.8,
+          "delegated": true
+        },
+        "metadata": {
+          "phase": "output",
+          "delegated": true
+        }
+      }
+    ]
+  },
+  {
+    "session_id": "test_user_1746219991302_20250502210631",
+    "user_id": "test_user_1746219991302",
+    "start_time": "2025-05-02T21:06:31.343991",
+    "interactions": [
+      {
+        "timestamp": "2025-05-02T21:06:31.345099",
+        "agent_type": "router",
+        "input": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "Eres un especialista en contratos para TDX. Tu funci\u00f3n es explicar t\u00e9rminos contractuales, responder preguntas legales y ayudar en la fase de contrataci\u00f3n. Debes asegurarte de que todos los contratos cumplan con la normativa legal vigente y protejan los intereses de todas las partes involucradas."
+            },
+            {
+              "role": "user",
+              "content": "hola"
+            }
+          ],
+          "client_info": {
+            "name": "Usuario de Prueba",
+            "company_name": "Empresa de Prueba",
+            "email": "test@example.com"
+          },
+          "agent_type": "contract_agent",
+          "user_id": "test_user_1746219991302"
+        },
+        "output": {},
+        "metadata": {
+          "phase": "input"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:06:34.040251",
+        "agent_type": "router",
+        "input": {},
+        "output": {
+          "response": "Hola, Usuario de Prueba. Bienvenido a TDX. Antes de continuar, necesito tu consentimiento para tratar tus datos personales seg\u00fan nuestra pol\u00edtica de privacidad. \u00bfEst\u00e1s de acuerdo?",
+          "intent_detected": "greeting",
+          "next_agent": "router",
+          "confidence": 0.9,
+          "delegated": false
+        },
+        "metadata": {
+          "phase": "output",
+          "delegated": false
+        }
+      }
+    ]
+  },
+  {
+    "session_id": "test_user_1746220002847_20250502210642",
+    "user_id": "test_user_1746220002847",
+    "start_time": "2025-05-02T21:06:42.874788",
+    "interactions": [
+      {
+        "timestamp": "2025-05-02T21:06:42.875334",
+        "agent_type": "router",
+        "input": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "Eres un especialista en contratos para TDX. Tu funci\u00f3n es explicar t\u00e9rminos contractuales, responder preguntas legales y ayudar en la fase de contrataci\u00f3n. Debes asegurarte de que todos los contratos cumplan con la normativa legal vigente y protejan los intereses de todas las partes involucradas."
+            },
+            {
+              "role": "user",
+              "content": "hola"
+            },
+            {
+              "role": "assistant",
+              "content": "Hola, Usuario de Prueba. Bienvenido a TDX. Antes de continuar, necesito tu consentimiento para tratar tus datos personales seg\u00fan nuestra pol\u00edtica de privacidad. \u00bfEst\u00e1s de acuerdo?"
+            },
+            {
+              "role": "user",
+              "content": "si"
+            }
+          ],
+          "client_info": {
+            "name": "Usuario de Prueba",
+            "company_name": "Empresa de Prueba",
+            "email": "test@example.com"
+          },
+          "agent_type": "contract_agent",
+          "user_id": "test_user_1746220002847"
+        },
+        "output": {},
+        "metadata": {
+          "phase": "input"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:06:45.832977",
+        "agent_type": "router",
+        "input": {},
+        "output": {
+          "response": "\u00a1Gracias por tu consentimiento! \u00bfEn qu\u00e9 puedo ayudarte hoy?",
+          "intent_detected": "consent_acceptance",
+          "next_agent": "prd",
+          "confidence": 0.9,
+          "delegated": false
+        },
+        "metadata": {
+          "phase": "output",
+          "delegated": false
+        }
+      }
+    ]
+  },
+  {
+    "session_id": "test_user_1746220021615_20250502210701",
+    "user_id": "test_user_1746220021615",
+    "start_time": "2025-05-02T21:07:01.647580",
+    "interactions": [
+      {
+        "timestamp": "2025-05-02T21:07:01.648414",
+        "agent_type": "router",
+        "input": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "Eres un especialista en contratos para TDX. Tu funci\u00f3n es explicar t\u00e9rminos contractuales, responder preguntas legales y ayudar en la fase de contrataci\u00f3n. Debes asegurarte de que todos los contratos cumplan con la normativa legal vigente y protejan los intereses de todas las partes involucradas."
+            },
+            {
+              "role": "user",
+              "content": "hola como estas"
+            }
+          ],
+          "client_info": {
+            "name": "Usuario de Prueba",
+            "company_name": "Empresa de Prueba",
+            "email": "test@example.com"
+          },
+          "agent_type": "contract_agent",
+          "user_id": "test_user_1746220021615"
+        },
+        "output": {},
+        "metadata": {
+          "phase": "input"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:07:03.236026",
+        "agent_type": "router->orchestrator",
+        "input": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "Eres un especialista en contratos para TDX. Tu funci\u00f3n es explicar t\u00e9rminos contractuales, responder preguntas legales y ayudar en la fase de contrataci\u00f3n. Debes asegurarte de que todos los contratos cumplan con la normativa legal vigente y protejan los intereses de todas las partes involucradas."
+            },
+            {
+              "role": "user",
+              "content": "hola como estas"
+            }
+          ],
+          "client_info": {
+            "name": "Usuario de Prueba",
+            "company_name": "Empresa de Prueba",
+            "email": "test@example.com"
+          },
+          "current_agent": "router",
+          "intent_detected": "general",
+          "user_id": "test_user_1746220021615",
+          "current_phase": "CONSENT"
+        },
+        "output": {},
+        "metadata": {
+          "phase": "delegation"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:07:10.432062",
+        "agent_type": "orchestrator->router",
+        "input": {},
+        "output": {
+          "response_content": "\u00a1Hola! Estoy aqu\u00ed para ayudarte con lo que necesites. \u00bfEn qu\u00e9 puedo asistirte hoy en relaci\u00f3n a los requisitos de tu proyecto?",
+          "next_agent": "prd",
+          "confidence": 0.8,
+          "current_phase": "CONSENT"
+        },
+        "metadata": {
+          "phase": "delegation_response"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:07:11.444156",
+        "agent_type": "router",
+        "input": {},
+        "output": {
+          "response": "\u00a1Hola! Estoy aqu\u00ed para ayudarte con lo que necesites. \u00bfEn qu\u00e9 puedo asistirte hoy en relaci\u00f3n a los requisitos de tu proyecto?",
+          "intent_detected": "general",
+          "next_agent": "prd",
+          "confidence": 0.8,
+          "delegated": true
+        },
+        "metadata": {
+          "phase": "output",
+          "delegated": true
+        }
+      }
+    ]
+  },
+  {
+    "session_id": "test_user_1746220068670_20250502210748",
+    "user_id": "test_user_1746220068670",
+    "start_time": "2025-05-02T21:07:48.701184",
+    "interactions": [
+      {
+        "timestamp": "2025-05-02T21:07:48.701726",
+        "agent_type": "router",
+        "input": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "Eres un especialista en contratos para TDX. Tu funci\u00f3n es explicar t\u00e9rminos contractuales, responder preguntas legales y ayudar en la fase de contrataci\u00f3n. Debes asegurarte de que todos los contratos cumplan con la normativa legal vigente y protejan los intereses de todas las partes involucradas."
+            },
+            {
+              "role": "user",
+              "content": "hola como estas"
+            },
+            {
+              "role": "assistant",
+              "content": "\u00a1Hola! Estoy aqu\u00ed para ayudarte con lo que necesites. \u00bfEn qu\u00e9 puedo asistirte hoy en relaci\u00f3n a los requisitos de tu proyecto?"
+            },
+            {
+              "role": "user",
+              "content": "quiero una aplicacion de helado digitales y que este integrada con whatsapp y emails"
+            }
+          ],
+          "client_info": {
+            "name": "Usuario de Prueba",
+            "company_name": "Empresa de Prueba",
+            "email": "test@example.com"
+          },
+          "agent_type": "contract_agent",
+          "user_id": "test_user_1746220068670"
+        },
+        "output": {},
+        "metadata": {
+          "phase": "input"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:07:49.479157",
+        "agent_type": "router->orchestrator",
+        "input": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "Eres un especialista en contratos para TDX. Tu funci\u00f3n es explicar t\u00e9rminos contractuales, responder preguntas legales y ayudar en la fase de contrataci\u00f3n. Debes asegurarte de que todos los contratos cumplan con la normativa legal vigente y protejan los intereses de todas las partes involucradas."
+            },
+            {
+              "role": "user",
+              "content": "hola como estas"
+            },
+            {
+              "role": "assistant",
+              "content": "\u00a1Hola! Estoy aqu\u00ed para ayudarte con lo que necesites. \u00bfEn qu\u00e9 puedo asistirte hoy en relaci\u00f3n a los requisitos de tu proyecto?"
+            },
+            {
+              "role": "user",
+              "content": "quiero una aplicacion de helado digitales y que este integrada con whatsapp y emails"
+            }
+          ],
+          "client_info": {
+            "name": "Usuario de Prueba",
+            "company_name": "Empresa de Prueba",
+            "email": "test@example.com"
+          },
+          "current_agent": "router",
+          "intent_detected": "prd",
+          "user_id": "test_user_1746220068670",
+          "current_phase": "CONSENT"
+        },
+        "output": {},
+        "metadata": {
+          "phase": "delegation"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:07:59.273572",
+        "agent_type": "orchestrator->router",
+        "input": {},
+        "output": {
+          "response_content": "\u00a1Eso suena emocionante! Crear una aplicaci\u00f3n de helados digitales integrada con WhatsApp y correo electr\u00f3nico puede ofrecer una experiencia \u00fanica para tus usuarios. Para ayudarte mejor, necesitar\u00eda un poco m\u00e1s de informaci\u00f3n sobre tus necesidades y expectativas. Aqu\u00ed tienes algunas preguntas que podr\u00edan guiarnos:\n\n1. **Funcionalidad Principal**: \u00bfQu\u00e9 caracter\u00edsticas principales te gustar\u00eda que tuviera la aplicaci\u00f3n de helados digitales? Por ejemplo, \u00bfquieres que los usuarios puedan personalizar su helado, hacer pedidos en l\u00ednea o recibir recomendaciones de sabores?\n\n2. **Integraci\u00f3n con WhatsApp**: \u00bfC\u00f3mo imaginas la integraci\u00f3n con WhatsApp? \u00bfTe gustar\u00eda que los usuarios puedan hacer pedidos directamente desde WhatsApp, o quiz\u00e1s recibir notificaciones y promociones a trav\u00e9s de esta plataforma?\n\n3. **Uso de Correo Electr\u00f3nico**: \u00bfC\u00f3mo planeas utilizar el correo electr\u00f3nico en tu aplicaci\u00f3n? \u00bfSer\u00e1 para enviar confirmaciones de pedidos, boletines informativos, promociones u otra cosa?\n\n4. **P\u00fablico Objetivo**: \u00bfQui\u00e9nes son tus usuarios principales? Esto puede influir en el dise\u00f1o y las funcionalidades de la aplicaci\u00f3n.\n\n5. **Plataforma**: \u00bfTienes en mente una plataforma espec\u00edfica para la aplicaci\u00f3n, como iOS, Android o ambas?\n\n6. **Presupuesto y Cronograma**: \u00bfTienes alg\u00fan presupuesto estimado o un cronograma en mente para la implementaci\u00f3n de este proyecto?\n\nCon estas respuestas, podr\u00e9 darte una orientaci\u00f3n m\u00e1s precisa sobre c\u00f3mo avanzar en el desarrollo de tu aplicaci\u00f3n.",
+          "next_agent": "prd",
+          "confidence": 0.8,
+          "current_phase": "CONSENT"
+        },
+        "metadata": {
+          "phase": "delegation_response"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:08:00.855789",
+        "agent_type": "router",
+        "input": {},
+        "output": {
+          "response": "\u00a1Eso suena emocionante! Crear una aplicaci\u00f3n de helados digitales integrada con WhatsApp y correo electr\u00f3nico puede ofrecer una experiencia \u00fanica para tus usuarios. Para ayudarte mejor, necesitar\u00eda un poco m\u00e1s de informaci\u00f3n sobre tus necesidades y expectativas. Aqu\u00ed tienes algunas preguntas que podr\u00edan guiarnos:\n\n1. **Funcionalidad Principal**: \u00bfQu\u00e9 caracter\u00edsticas principales te gustar\u00eda que tuviera la aplicaci\u00f3n de helados digitales? Por ejemplo, \u00bfquieres que los usuarios puedan personalizar su helado, hacer pedidos en l\u00ednea o recibir recomendaciones de sabores?\n\n2. **Integraci\u00f3n con WhatsApp**: \u00bfC\u00f3mo imaginas la integraci\u00f3n con WhatsApp? \u00bfTe gustar\u00eda que los usuarios puedan hacer pedidos directamente desde WhatsApp, o quiz\u00e1s recibir notificaciones y promociones a trav\u00e9s de esta plataforma?\n\n3. **Uso de Correo Electr\u00f3nico**: \u00bfC\u00f3mo planeas utilizar el correo electr\u00f3nico en tu aplicaci\u00f3n? \u00bfSer\u00e1 para enviar confirmaciones de pedidos, boletines informativos, promociones u otra cosa?\n\n4. **P\u00fablico Objetivo**: \u00bfQui\u00e9nes son tus usuarios principales? Esto puede influir en el dise\u00f1o y las funcionalidades de la aplicaci\u00f3n.\n\n5. **Plataforma**: \u00bfTienes en mente una plataforma espec\u00edfica para la aplicaci\u00f3n, como iOS, Android o ambas?\n\n6. **Presupuesto y Cronograma**: \u00bfTienes alg\u00fan presupuesto estimado o un cronograma en mente para la implementaci\u00f3n de este proyecto?\n\nCon estas respuestas, podr\u00e9 darte una orientaci\u00f3n m\u00e1s precisa sobre c\u00f3mo avanzar en el desarrollo de tu aplicaci\u00f3n.",
           "intent_detected": "prd",
           "next_agent": "prd",
           "confidence": 0.8,
