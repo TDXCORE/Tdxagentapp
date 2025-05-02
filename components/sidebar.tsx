@@ -58,7 +58,6 @@ export function Sidebar() {
     { href: "/dashboard/projects", label: "Proyectos", icon: FolderKanban },
     { href: "/dashboard/inbox", label: "Inbox", icon: InboxIcon },
     { href: "/dashboard/quotation", label: "Cotizaciones", icon: Calculator },
-    { href: "/dashboard/agent-chat", label: "Chat con Agente", icon: MessageSquare },
     { href: "/dashboard/agent-setup", label: "Agent Setup", icon: Bot },
     { href: "/dashboard/prd-generator", label: "Generador de PRD", icon: FileText },
     { href: "/dashboard/meetings", label: "Reuniones", icon: CalendarClock },
