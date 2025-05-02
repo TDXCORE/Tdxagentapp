@@ -4,6 +4,11 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import openai
 from dotenv import load_dotenv
+import logging
+
+# Configurar logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger("prd_agent")
 
 # Load environment variables
 load_dotenv()

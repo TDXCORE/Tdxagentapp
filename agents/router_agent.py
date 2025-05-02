@@ -209,12 +209,13 @@ async def chat(request: ChatRequest) -> ChatResponse:
             
             # Delegar al orquestador
             orchestrator_result = await delegate_to_orchestrator(
-                user_id=user_id, 
+                user_id=user_id,
                 messages=request.messages,
                 intent=intent,
                 current_phase=current_phase,
                 rag_context=rag_context,
-                client_info=request.client_info
+                client_info=request.client_info,
+                session_id=session_id
             )
             
             # El orquestador nos devuelve la respuesta formateada para el cliente
@@ -507,17 +508,7 @@ def get_router_prompt(current_phase: str, rag_context: Optional[Dict[str, Any]])
         base_prompt += "\n\nDocumentos generados previamente:\n"
         for doc in rag_context["relevant_documents"]:
             base_prompt += f"- {doc.get('type', 'Documento').upper()}: {doc.get('title', 'Sin título')}\n"
-    # Añadir contexto de conversaciones anteriores si está disponible
-    if rag_context and "recent_conversations" in rag_context and rag_context["recent_conversations"]:
-        base_prompt += "\n\nContexto de conversaciones recientes:\n"
-        for i, conv in enumerate(rag_context["recent_conversations"][:3]):  # Limitamos a las 3 más relevantes
-            base_prompt += f"- Cliente: {conv.get('content', '')}\n  Sistema: {conv.get('response', '')}\n"
-    
-    # Añadir información sobre documentos generados si está disponible
-    if rag_context and "relevant_documents" in rag_context and rag_context["relevant_documents"]:
-        base_prompt += "\n\nDocumentos generados previamente:\n"
-        for doc in rag_context["relevant_documents"]:
-            base_prompt += f"- {doc.get('type', 'Documento').upper()}: {doc.get('title', 'Sin título')}\n"
+    # Sección eliminada para evitar duplicación
     
     # Añadir instrucción final
     base_prompt += """
@@ -596,7 +587,8 @@ async def delegate_to_orchestrator(user_id: str,
                                 intent: str,
                                 current_phase: str,
                                 rag_context: Optional[Dict[str, Any]] = None,
-                                client_info: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+                                client_info: Optional[Dict[str, Any]] = None,
+                                session_id: Optional[str] = None) -> Dict[str, Any]:
     """
     Delega el procesamiento al orquestador.
     En un entorno real, esto sería una llamada a la API del orquestrador.
@@ -610,6 +602,14 @@ async def delegate_to_orchestrator(user_id: str,
         # Preparar la solicitud para el orquestador
         # Convertir los objetos Message a diccionarios antes de crear la solicitud
         messages_dict = [{"role": m.role, "content": m.content} for m in messages]
+        
+        # Obtener el session_id si no se proporcionó
+        if session_id is None:
+            try:
+                session_id = agent_logger.get_current_session_id()
+                logger.info(f"Session ID obtenido: {session_id}")
+            except Exception as session_error:
+                logger.error(f"Error al obtener session_id: {str(session_error)}")
         
         orchestrator_request = OrchestratorRequest(
             messages=messages_dict,

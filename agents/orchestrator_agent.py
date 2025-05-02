@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import logging
 from .rag_system import rag_system
 from .logger_system import agent_logger
-from .evaluator import evaluator  # Importar el evaluador
+import evaluator  # Importar el módulo evaluador correctamente
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -34,6 +34,7 @@ class OrchestratorRequest(BaseModel):
     user_id: str
     current_phase: Optional[str] = None
     rag_context: Optional[Dict[str, Any]] = None
+    session_id: Optional[str] = None  # Añadir campo session_id
 
 class OrchestratorResponse(BaseModel):
     next_agent: str
