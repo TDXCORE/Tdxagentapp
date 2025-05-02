@@ -10386,5 +10386,55 @@
         }
       }
     ]
+  },
+  {
+    "session_id": "test_user_1746220798725_20250502211958",
+    "user_id": "test_user_1746220798725",
+    "start_time": "2025-05-02T21:19:58.760308",
+    "interactions": [
+      {
+        "timestamp": "2025-05-02T21:19:58.761236",
+        "agent_type": "router",
+        "input": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "Eres un asistente \u00fatil para TDX, una empresa de desarrollo tecnol\u00f3gico. Tu funci\u00f3n es saludar al cliente, comprender sus necesidades y dirigirlos al agente especializado adecuado. Pregunta por su nombre, empresa y una breve descripci\u00f3n de lo que est\u00e1n buscando. Debes ser amable, profesional y eficiente en la identificaci\u00f3n de las necesidades del cliente."
+            },
+            {
+              "role": "user",
+              "content": "hola"
+            }
+          ],
+          "client_info": {
+            "name": "Usuario de Prueba",
+            "company_name": "Empresa de Prueba",
+            "email": "test@example.com"
+          },
+          "agent_type": "router_agent",
+          "user_id": "test_user_1746220798725"
+        },
+        "output": {},
+        "metadata": {
+          "phase": "input"
+        }
+      },
+      {
+        "timestamp": "2025-05-02T21:20:01.300330",
+        "agent_type": "router",
+        "input": {},
+        "output": {
+          "response": "\u00a1Hola! Bienvenido a TDX. Antes de continuar, necesito tu consentimiento para tratar tus datos personales seg\u00fan nuestra pol\u00edtica de privacidad. \u00bfEst\u00e1s de acuerdo?",
+          "intent_detected": "greeting",
+          "next_agent": "router",
+          "confidence": 0.9,
+          "delegated": false
+        },
+        "metadata": {
+          "phase": "output",
+          "delegated": false
+        }
+      }
+    ]
   }
 ]
