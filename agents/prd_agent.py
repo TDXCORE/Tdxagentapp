@@ -117,6 +117,10 @@ async def generate_prd(request: PRDRequest) -> PRDResponse:
         # Extract the PRD content
         prd_content = response.choices[0].message.content
         
+        # Añadir el tag <<PRD_READY>> al final del contenido del PRD
+        prd_content += "\n\n<<PRD_READY>>"
+        logger.info("Añadido tag <<PRD_READY>> al final del PRD")
+        
         # Generate follow-up questions to fill any gaps
         follow_up_messages = messages.copy()
         follow_up_messages.append({

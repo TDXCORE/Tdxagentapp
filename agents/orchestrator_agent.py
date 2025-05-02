@@ -255,6 +255,11 @@ async def orchestrate(request: Request) -> OrchestratorResponse:
             except Exception as e:
                 logger.error(f"Error al actualizar fase del cliente: {str(e)}")
         
+        # Si next_agent no es router, establecer response_content a cadena vacía
+        if next_agent != 'router':
+            logger.info(f"Estableciendo response_content a cadena vacía para agente: {next_agent}")
+            response_content = ''
+        
         # Crear respuesta
         response = OrchestratorResponse(
             next_agent=next_agent,
@@ -283,14 +288,12 @@ async def orchestrate(request: Request) -> OrchestratorResponse:
             try:
                 logger.info(f"Llamando al evaluator para agente: {next_agent}")
                 evaluator.evaluate_conversation(
-                    user_id=user_id,
-                    messages=messages,
-                    agent_type=next_agent,
-                    phase=current_phase
+                    conversation_history=[Message(**m) for m in messages],
+                    agent_type=next_agent
                 )
                 logger.info("Evaluación completada")
             except Exception as eval_error:
-                logger.error(f"Error al llamar al evaluator: {str(eval_error)}")
+                logger.warning(f"Evaluator error: {eval_error}")
                 # No interrumpir el flujo si hay error en la evaluación
         
         return response

@@ -199,6 +199,14 @@ async def chat(request: ChatRequest) -> ChatResponse:
         
         if should_delegate:
             logger.info(f"Delegando al orquestador para usuario {user_id}")
+            
+            # Insertar etiqueta y resumen ANTES de delegar
+            if intent in {'prd','qualification'} and '<<NEXT:' not in last_message:
+                short = last_message[:80]
+                request.messages.append(Message(role='assistant',
+                    content=f'Perfecto, necesitas una app: {short}. <<NEXT:PRD>>'))
+                logger.info(f"Añadida etiqueta <<NEXT:PRD>> con resumen: {short}")
+            
             # Delegar al orquestador
             orchestrator_result = await delegate_to_orchestrator(
                 user_id=user_id, 
@@ -481,53 +489,24 @@ def detect_intent(text: str) -> str:
     
     # Por defecto, retornamos intención general
     return "general"
-
 def get_router_prompt(current_phase: str, rag_context: Optional[Dict[str, Any]]) -> str:
     """
     Genera un prompt enriquecido para el router basado en la fase actual y el contexto RAG.
     """
-    base_prompt = """
-    Eres un asistente inteligente para TDX, una empresa de desarrollo tecnológico.
-    Tu función es ser el ÚNICO punto de contacto con el cliente a través de WhatsApp.
+    # Usar el prompt simplificado del SYSTEM_PROMPTS["router"]
+    base_prompt = SYSTEM_PROMPTS["router"]
     
-    Recuerda que eres el primer punto de contacto con el cliente, y tu rol es saludar,
-    comprender sus necesidades y proporcionar una respuesta amigable y profesional.
+    # Añadir contexto de conversaciones anteriores si está disponible
+    if rag_context and "recent_conversations" in rag_context and rag_context["recent_conversations"]:
+        base_prompt += "\n\nContexto de conversaciones recientes:\n"
+        for i, conv in enumerate(rag_context["recent_conversations"][:3]):  # Limitamos a las 3 más relevantes
+            base_prompt += f"- Cliente: {conv.get('content', '')}\n  Sistema: {conv.get('response', '')}\n"
     
-    IMPORTANTE: Siempre debes obtener el nombre del cliente y su empresa al inicio de la conversación.
-    """
-    
-    # Añadir instrucciones específicas según la fase
-    if current_phase == "CONSENT":
-        base_prompt += """
-        En este momento, es CRÍTICO obtener el consentimiento del cliente para tratar sus datos.
-        
-        Si el cliente no ha dado su consentimiento aún, debes pedir su consentimiento explícito
-        con un mensaje como:
-        
-        "Bienvenido a TDX. Antes de continuar, necesito tu consentimiento para tratar tus datos personales
-        según nuestra política de privacidad. ¿Estás de acuerdo?"
-        
-        Solo cuando el cliente responda con un "sí" explícito, podrás avanzar a la siguiente fase.
-        
-        Después de obtener el consentimiento, pregunta inmediatamente por su nombre y empresa:
-        "¡Gracias por tu consentimiento! Para poder ayudarte mejor, ¿podrías compartir tu nombre y el nombre de tu empresa?"
-        """
-    elif current_phase == "QUALIFICATION":
-        base_prompt += """
-        Estamos en la fase de CUALIFICACIÓN del cliente. El objetivo es determinar si el cliente
-        es adecuado para nuestros servicios, usando el método BANT:
-        
-        B - Budget (Presupuesto): ¿Cuánto está dispuesto a invertir?
-        A - Authority (Autoridad): ¿Es la persona que toma decisiones?
-        N - Need (Necesidad): ¿Cuál es su necesidad específica?
-        T - Timeline (Plazo): ¿Cuándo necesita implementar la solución?
-        
-        Haz preguntas cortas y directas para obtener esta información. No hagas todas las preguntas
-        a la vez, ve paso a paso para no abrumar al cliente.
-        
-        Si aún no tienes el nombre y empresa del cliente, pregunta por estos datos primero.
-        """
-    
+    # Añadir información sobre documentos generados si está disponible
+    if rag_context and "relevant_documents" in rag_context and rag_context["relevant_documents"]:
+        base_prompt += "\n\nDocumentos generados previamente:\n"
+        for doc in rag_context["relevant_documents"]:
+            base_prompt += f"- {doc.get('type', 'Documento').upper()}: {doc.get('title', 'Sin título')}\n"
     # Añadir contexto de conversaciones anteriores si está disponible
     if rag_context and "recent_conversations" in rag_context and rag_context["recent_conversations"]:
         base_prompt += "\n\nContexto de conversaciones recientes:\n"
@@ -637,7 +616,9 @@ async def delegate_to_orchestrator(user_id: str,
             client_info=client_info,
             current_agent="router",
             intent_detected=intent,
-            user_id=user_id
+            user_id=user_id,
+            current_phase=current_phase,  # Añadir current_phase explícitamente
+            session_id=session_id  # Añadir session_id explícitamente
         )
         
         # Registrar delegación al orquestador
